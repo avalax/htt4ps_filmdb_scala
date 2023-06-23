@@ -1,6 +1,6 @@
 package de.avalax.filmdb
 
-import cats.effect.Concurrent
+import cats.effect.{Concurrent, IO}
 import cats.effect.kernel.Async
 import cats.implicits.*
 import de.avalax.filmdb.domain.model.Film
@@ -12,16 +12,17 @@ import org.http4s.{EntityDecoder, EntityEncoder, HttpRoutes, UrlForm}
 import io.circe.syntax.*
 
 object Routes:
-  def filmDbRoutes[F[_] : Concurrent](filmDb: FilmService[F]): HttpRoutes[F] =
-    implicit val decoder: EntityDecoder[F, Film] = jsonOf[F, Film]
-    val dsl = new Http4sDsl[F] {}
+  def filmDbRoutes(filmDb: FilmService[IO]): HttpRoutes[IO] =
+    implicit val decoder: EntityDecoder[IO, Film] = jsonOf[IO, Film]
+    val dsl = new Http4sDsl[IO] {}
     import dsl.*
-    HttpRoutes.of[F] {
+    HttpRoutes.of[IO] {
       case GET -> Root =>
         for {
           films <- filmDb.allFilms
           resp <- Ok(films)
         } yield resp
+        // TODO Fehlerbehandlung
       case req@POST -> Root / "film" =>
         for {
           body <- req.as[Film]

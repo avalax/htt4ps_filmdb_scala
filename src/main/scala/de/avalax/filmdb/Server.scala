@@ -12,13 +12,13 @@ import org.http4s.server.middleware.Logger
 
 object Server:
 
-  def run[F[_]: Async](filmRepository: FilmRepository[F]): F[Nothing] = {
-    val filmDb = FilmService.impl[F](filmRepository)
-    val httpApp = Routes.filmDbRoutes[F](filmDb).orNotFound
+  def run(filmRepository: FilmRepository[IO]): IO[Nothing] = {
+    val filmDb = FilmService.impl[IO](filmRepository)
+    val httpApp = Routes.filmDbRoutes(filmDb).orNotFound
     // With Middlewares in place
     val finalHttpApp = Logger.httpApp(true, true)(httpApp)
 
-    EmberServerBuilder.default[F]
+    EmberServerBuilder.default[IO]
       .withHost(ipv4"0.0.0.0")
       .withPort(port"8080")
       .withHttpApp(finalHttpApp)

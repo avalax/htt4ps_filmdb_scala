@@ -5,4 +5,4 @@ import de.avalax.filmdb.domain.model.FilmRepository.FilmMockRepository
 
 object Main extends IOApp.Simple:
   private val filmRepository = new FilmMockRepository()
-  val run: IO[Nothing] = Server.run[IO](filmRepository)
+  val run: IO[Nothing] = Server.run(filmRepository)

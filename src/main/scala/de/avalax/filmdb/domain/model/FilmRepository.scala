@@ -16,8 +16,13 @@ object FilmRepository:
       IO(films)
 
     override def save(film: Film): IO[Film] = {
-      IO {
-        films = films :+ film
-        film
+      if (film.name == "") {
+        IO.raiseError(new Exception("doof"))
+      }
+      else {
+        IO {
+          films = films :+ film
+          film
+        }
       }
     }
